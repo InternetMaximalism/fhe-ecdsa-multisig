@@ -1,7 +1,7 @@
 {
-  "name": "intamx-homomorphic-wallet",
+  "name": "fhe-ecdsa-multisig",
   "version": "0.0.0",
-  "description": "",
+  "description": "Javascript library of ecdsa multisig with Fully Homomorphic Encryption",
   "main": "index.js",
   "type": "module",
   "scripts": {
