@@ -8,7 +8,7 @@
     "test": "mocha"
   },
   "author": "Leona Hioki",
-  "license": "ISC",
+  "license": "",
   "dependencies": {
     "elliptic": "^6.5.4",
     "node-fetch": "^2.6.9",
