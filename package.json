@@ -12,6 +12,6 @@
   "dependencies": {
     "elliptic": "^6.5.4",
     "node-seal": "^5.1.1",
-    "nodeseal-bn": "^0.0.3"
+    "nodeseal-bn": "github:InternetMaximalism/nodeseal-bn#wasmcompile"
   }
 }
