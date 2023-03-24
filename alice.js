@@ -82,7 +82,7 @@ function _recoverEncyptedMultSig(
   multiK,
   multiP
 ) {
-  var s = decryptMatrixToBN(
+  let s = decryptMatrixToBN(
     step1Data.decryptor,
     cipherTextMatrix.contents,
     step1Data.setup.encoder
@@ -91,7 +91,8 @@ function _recoverEncyptedMultSig(
   if (
     s.gte(
       new BN(
-        "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0"
+        "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0",
+        "hex"
       )
     )
   ) {
