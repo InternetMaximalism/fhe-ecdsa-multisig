@@ -88,35 +88,22 @@ function _recoverEncyptedMultSig(
     step1Data.setup.encoder
   );
   var s = s_.mul(new BN(alicek.kinv)).umod(alicek.n);
-  var sinv = s.invm(alicek.n);
+  // var sinv = s.invm(alicek.n);
 
-  var u1 = sinv.mul(message).umod(alicek.n);
-  var u2 = sinv.mul(multiK.getX()).umod(alicek.n);
-  var p;
-  p = ec.g.mul(u1);
-  var p2 = multiP.mul(u2);
-  p = p.add(p2);
+  // var u1 = sinv.mul(message).umod(alicek.n);
+  // var u2 = sinv.mul(multiK.getX()).umod(alicek.n);
+  // var p;
+  // p = ec.g.mul(u1);
+  // var p2 = multiP.mul(u2);
+  // p = p.add(p2);
 
-  // FIXME: signature
   const signature = getSignature(multiK, s);
 
-  const serializedPublicKey = "0x" + multiP.encode("hex", false);
-  console.log("serializedPublicKey", serializedPublicKey);
-
-  const address = ethers.utils.computeAddress(serializedPublicKey);
-  console.log("address", address);
-
+  const address = ethers.utils.computeAddress("0x" + multiP.encode("hex", false));
   const digest = message.toArray();
-  const signingPublicKey = ethers.utils.recoverPublicKey(digest, signature);
-  console.log("signingPublicKey", signingPublicKey);
-  const signingAddress = ethers.utils.recoverAddress(digest, signature);
-  console.log("signingAddress", signingAddress);
+  const recoveredAddress = ethers.utils.recoverAddress(digest, signature);
 
-  if (p.x.toString() === multiK.getX().toString()) {
-    return true;
-  } else {
-    return false;
-  }
+  return address === recoveredAddress;
 }
 
 function getSignature(multiK, s) {
