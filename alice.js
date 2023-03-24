@@ -82,7 +82,7 @@ function _recoverEncyptedMultSig(
   multiK,
   multiP
 ) {
-  var s_ = decryptMatrixToBN(
+  var s = decryptMatrixToBN(
     step1Data.decryptor,
     cipherTextMatrix.contents,
     step1Data.setup.encoder
