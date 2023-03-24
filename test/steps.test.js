@@ -6,6 +6,7 @@ import { getMultiSigAddressPoint } from "../lib/getMultiSigAddressPoint.js";
 import { EC } from "../lib/makek.js";
 import { keccak256 } from "@ethersproject/keccak256";
 import { serialize } from "@ethersproject/transactions";
+import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
 
@@ -41,7 +42,11 @@ describe("test for exported functions", async function () {
     //Alice
     var alicekey = ec.genKeyPair();
     var bobkey = ec.genKeyPair();
-    var multiP = getMultiSigAddressPoint(alicekey, bobkey);
+    var multiP = getMultiSigAddressPoint(alicekey, bobkey.getPublic());
+    const address = ethers.utils.computeAddress(
+      "0x" + multiP.encode("hex", false)
+    );
+
     var step1Data = await step1(alicekey, message);
 
     //Bob
@@ -51,7 +56,7 @@ describe("test for exported functions", async function () {
     //Alice
     var signature = step3(fromBob, step1Data);
 
-    var validity = recoverEncryptedMultiSig(message, multiP, signature);
+    var validity = recoverEncryptedMultiSig(message, address, signature);
     assert.equal(validity, true);
 
     sendSignature(txParams, signature);

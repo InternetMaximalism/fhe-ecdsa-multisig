@@ -1,10 +1,9 @@
 import { hexZeroPad, joinSignature } from "@ethersproject/bytes";
-import { computeAddress, recoverAddress, serialize } from "@ethersproject/transactions";
+import { recoverAddress } from "@ethersproject/transactions";
 import BN from "bn.js";
 import { randomBytes } from "crypto";
 import { decryptMatrixToBN, LWEencrypt, LWEsetup } from "nodeseal-bn";
 import { EC } from "./lib/makek.js";
-import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
 
@@ -96,10 +95,7 @@ function _calcSignature(step1Data, cipherTextMatrix, alicek, multiK) {
   return signature;
 }
 
-export function recoverEncryptedMultiSig(message, multiP, signature) {
-  const address = ethers.utils.computeAddress(
-    "0x" + multiP.encode("hex", false)
-  );
+export function recoverEncryptedMultiSig(message, address, signature) {
   const digest = message.toArray();
   const recoveredAddress = recoverAddress(digest, signature);
 
