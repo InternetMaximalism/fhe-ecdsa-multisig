@@ -22,6 +22,6 @@ describe("test for exported functions", async function () {
 
     //Alice
     var signature = step3(fromBob, step1Data, multiP);
-    assert.equal(signature, true);
+    assert.equal(signature.result, true);
   });
 });

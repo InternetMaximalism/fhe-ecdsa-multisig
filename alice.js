@@ -103,7 +103,10 @@ function _recoverEncyptedMultSig(
   const digest = message.toArray();
   const recoveredAddress = recoverAddress(digest, signature);
 
-  return address === recoveredAddress;
+  return {
+    result: address === recoveredAddress,
+    signature,
+  };
 }
 
 function getSignature(multiK, s) {
