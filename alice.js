@@ -3,6 +3,7 @@ import BN from "bn.js";
 import { randomBytes } from "crypto";
 import { decryptMatrixToBN, LWEencrypt, LWEsetup } from "nodeseal-bn";
 import { EC } from "./lib/makek.js";
+import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
 
@@ -98,7 +99,18 @@ function _recoverEncyptedMultSig(
 
   // FIXME: signature
   const signature = getSignature(multiK, s);
-  console.log("signature", signature);
+
+  const serializedPublicKey = "0x" + multiP.encode("hex", false);
+  console.log("serializedPublicKey", serializedPublicKey);
+
+  const address = ethers.utils.computeAddress(serializedPublicKey);
+  console.log("address", address);
+
+  const digest = message.toArray();
+  const signingPublicKey = ethers.utils.recoverPublicKey(digest, signature);
+  console.log("signingPublicKey", signingPublicKey);
+  const signingAddress = ethers.utils.recoverAddress(digest, signature);
+  console.log("signingAddress", signingAddress);
 
   if (p.x.toString() === multiK.getX().toString()) {
     return true;
@@ -132,9 +144,9 @@ function getSignature(multiK, s) {
     s,
   };
 
-  return splitSignature({
+  return {
     recoveryParam: signature.recoveryParam,
     r: hexZeroPad("0x" + signature.r.toString(16), 32),
     s: hexZeroPad("0x" + signature.s.toString(16), 32),
-  });
+  };
 }
