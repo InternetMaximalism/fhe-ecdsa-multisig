@@ -11,8 +11,8 @@
   "license": "",
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
+    "@ethersproject/transactions": "^5.7.0",
     "elliptic": "^6.5.4",
-    "ethers": "^5",
     "node-seal": "^5.1.1",
     "nodeseal-bn": "^0.0.3"
   }

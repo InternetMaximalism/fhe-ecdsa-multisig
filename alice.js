@@ -1,9 +1,9 @@
-import { hexZeroPad, splitSignature } from "@ethersproject/bytes";
+import { hexZeroPad } from "@ethersproject/bytes";
+import { computeAddress, recoverAddress } from "@ethersproject/transactions";
 import BN from "bn.js";
 import { randomBytes } from "crypto";
 import { decryptMatrixToBN, LWEencrypt, LWEsetup } from "nodeseal-bn";
 import { EC } from "./lib/makek.js";
-import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
 
@@ -99,9 +99,9 @@ function _recoverEncyptedMultSig(
 
   const signature = getSignature(multiK, s);
 
-  const address = ethers.utils.computeAddress("0x" + multiP.encode("hex", false));
+  const address = computeAddress("0x" + multiP.encode("hex", false));
   const digest = message.toArray();
-  const recoveredAddress = ethers.utils.recoverAddress(digest, signature);
+  const recoveredAddress = recoverAddress(digest, signature);
 
   return address === recoveredAddress;
 }
