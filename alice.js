@@ -1,9 +1,10 @@
 import { hexZeroPad, joinSignature } from "@ethersproject/bytes";
-import { computeAddress, recoverAddress } from "@ethersproject/transactions";
+import { computeAddress, recoverAddress, serialize } from "@ethersproject/transactions";
 import BN from "bn.js";
 import { randomBytes } from "crypto";
 import { decryptMatrixToBN, LWEencrypt, LWEsetup } from "nodeseal-bn";
 import { EC } from "./lib/makek.js";
+import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
 
@@ -39,19 +40,17 @@ export async function step1(aliceKey, message) {
   return { setup: setup, k: alicek, forBob: forBob, decryptor: decryptor };
 }
 
-export function step3(fromBob, step1Data, multiAddressPoint) {
+export function step3(fromBob, step1Data) {
   var det = _verifyMultiK(fromBob, step1Data.forBob, step1Data.k);
   if (!det) {
     console.log("here");
     return false;
   }
-  var data = _recoverEncyptedMultSig(
+  var data = _calcSignature(
     step1Data,
     fromBob.cipherTextMatrix,
     step1Data.k,
-    step1Data.forBob.message,
-    fromBob.multiK,
-    multiAddressPoint
+    fromBob.multiK
   );
   return data;
 }
@@ -74,14 +73,7 @@ function _verifyMultiK(fromBob, forBob, alicek) {
   return false;
 }
 
-function _recoverEncyptedMultSig(
-  step1Data,
-  cipherTextMatrix,
-  alicek,
-  message,
-  multiK,
-  multiP
-) {
+function _calcSignature(step1Data, cipherTextMatrix, alicek, multiK) {
   let s = decryptMatrixToBN(
     step1Data.decryptor,
     cipherTextMatrix.contents,
@@ -99,18 +91,15 @@ function _recoverEncyptedMultSig(
     s = alicek.n.sub(s);
   }
 
-  // var sinv = s.invm(alicek.n);
-
-  // var u1 = sinv.mul(message).umod(alicek.n);
-  // var u2 = sinv.mul(multiK.getX()).umod(alicek.n);
-  // var p;
-  // p = ec.g.mul(u1);
-  // var p2 = multiP.mul(u2);
-  // p = p.add(p2);
-
   const signature = getSignature(multiK, s);
 
-  const address = computeAddress("0x" + multiP.encode("hex", false));
+  return signature;
+}
+
+export function recoverEncryptedMultiSig(message, multiP, signature) {
+  const address = ethers.utils.computeAddress(
+    "0x" + multiP.encode("hex", false)
+  );
   const digest = message.toArray();
   const recoveredAddress = recoverAddress(digest, signature);
 
