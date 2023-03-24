@@ -1,4 +1,4 @@
-import { hexZeroPad } from "@ethersproject/bytes";
+import { hexZeroPad, joinSignature } from "@ethersproject/bytes";
 import { computeAddress, recoverAddress } from "@ethersproject/transactions";
 import BN from "bn.js";
 import { randomBytes } from "crypto";
@@ -87,7 +87,17 @@ function _recoverEncyptedMultSig(
     cipherTextMatrix.contents,
     step1Data.setup.encoder
   );
-  var s = s_.mul(new BN(alicek.kinv)).umod(alicek.n);
+  s = s.mul(new BN(alicek.kinv)).umod(alicek.n);
+  if (
+    s.gte(
+      new BN(
+        "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0"
+      )
+    )
+  ) {
+    s = alicek.n.sub(s);
+  }
+
   // var sinv = s.invm(alicek.n);
 
   // var u1 = sinv.mul(message).umod(alicek.n);
@@ -105,7 +115,7 @@ function _recoverEncyptedMultSig(
 
   return {
     result: address === recoveredAddress,
-    signature,
+    signature: joinSignature(signature),
   };
 }
 
