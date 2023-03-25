@@ -79,16 +79,16 @@ function _calcSignature(step1Data, cipherTextMatrix, alicek, multiK) {
     step1Data.setup.encoder
   );
   s = s.mul(new BN(alicek.kinv)).umod(alicek.n);
-  if (
-    s.gte(
-      new BN(
-        "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0",
-        "hex"
-      )
-    )
-  ) {
-    s = alicek.n.sub(s);
-  }
+  // if (
+  //   s.gte(
+  //     new BN(
+  //       "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0",
+  //       "hex"
+  //     )
+  //   )
+  // ) {
+  //   s = alicek.n.sub(s);
+  // }
 
   const signature = getSignature(multiK, s);
 
@@ -107,8 +107,7 @@ export function recoverEncryptedMultiSig(message, address, signature) {
 
 function getSignature(multiK, s) {
   const n = multiK.curve.n;
-  const nh = multiK.curve.n.ushrn(1); // n half
-  console.log("nh", nh);
+  const nh = multiK.curve.n.ushrn(1);
 
   var kpX = multiK.getX();
   var r = kpX.umod(n);
