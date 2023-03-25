@@ -5,7 +5,11 @@ import { ethers } from "ethers";
 import { strict as assert } from "node:assert";
 import { recoverEncryptedMultiSig, step1, step3 } from "../alice.js";
 import { step2 } from "../bob.js";
-import { getMultiSigAddressPoint } from "../lib/getMultiSigAddressPoint.js";
+import {
+  getMultiSigAddressPoint,
+  getMultiSigPrivateKey,
+  recoverAliceKeyFromMultiSigKey,
+} from "../lib/getMultiSigAddressPoint.js";
 import { EC } from "../lib/makek.js";
 
 var ec = new EC("secp256k1");
@@ -60,4 +64,12 @@ describe("test for exported functions", async function () {
 
     // sendSignature(txParams, signature);
   });
+
+  it("recover Alice key from multi-sig key", async function () {
+    const aliceKey = ec.genKeyPair();
+    const bobKey = ec.genKeyPair();
+    const multiSigKey = getMultiSigPrivateKey(aliceKey, bobKey);
+    const recoveredAliceKey = recoverAliceKeyFromMultiSigKey(multiSigKey, bobKey);
+    assert.ok(recoveredAliceKey.eq(aliceKey.getPrivate()));
+  })
 });
