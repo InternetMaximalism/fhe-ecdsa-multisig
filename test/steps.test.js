@@ -1,14 +1,16 @@
+import { keccak256 } from "@ethersproject/keccak256";
+import { serialize } from "@ethersproject/transactions";
 import BN from "bn.js";
+import { ethers } from "ethers";
 import { strict as assert } from "node:assert";
-import { step1, step3, recoverEncryptedMultiSig } from "../alice.js";
+import { recoverEncryptedMultiSig, step1, step3 } from "../alice.js";
 import { step2 } from "../bob.js";
 import { getMultiSigAddressPoint } from "../lib/getMultiSigAddressPoint.js";
 import { EC } from "../lib/makek.js";
-import { keccak256 } from "@ethersproject/keccak256";
-import { serialize } from "@ethersproject/transactions";
-import { ethers } from "ethers";
 
 var ec = new EC("secp256k1");
+
+const INFURA_URL = process.env.INFURA_URL;
 
 const createTransaction = () => {
   const txParams = {
@@ -26,10 +28,7 @@ const createTransaction = () => {
 };
 
 export async function sendSignature(txParams, signature) {
-  const provider = new ethers.providers.JsonRpcProvider(
-    `https://goerli.infura.io/v3/xxx`
-  );
-
+  const provider = new ethers.providers.JsonRpcProvider(INFURA_URL);
   const signedTransaction = serialize(txParams, signature);
   const receipt = await provider.sendTransaction(signedTransaction);
   await receipt.wait();
@@ -56,9 +55,9 @@ describe("test for exported functions", async function () {
     //Alice
     var signature = step3(fromBob, step1Data);
 
-    var validity = recoverEncryptedMultiSig(message, address, signature);
+    var { validity } = recoverEncryptedMultiSig(message, address, signature);
     assert.equal(validity, true);
 
-    sendSignature(txParams, signature);
+    // sendSignature(txParams, signature);
   });
 });

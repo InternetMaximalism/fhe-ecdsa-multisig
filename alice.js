@@ -42,7 +42,6 @@ export async function step1(aliceKey, message) {
 export function step3(fromBob, step1Data) {
   var det = _verifyMultiK(fromBob, step1Data.forBob, step1Data.k);
   if (!det) {
-    console.log("here");
     return false;
   }
   var data = _calcSignature(
@@ -100,7 +99,7 @@ export function recoverEncryptedMultiSig(message, address, signature) {
   const recoveredAddress = recoverAddress(digest, signature);
 
   return {
-    result: address === recoveredAddress,
+    validity: address === recoveredAddress,
     signature: joinSignature(signature),
   };
 }
