@@ -13,7 +13,7 @@
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/transactions": "^5.7.0",
     "elliptic": "^6.5.4",
-    "nodeseal-bn": "github:InternetMaximalism/nodeseal-bn#8ac42f129e87ff3a400a4c571b4e6b3b230ea00b"
+    "nodeseal-bn": "github:InternetMaximalism/nodeseal-bn#a3f748373a5e3533a171dcc323b03d6d29e8345d"
   },
   "devDependencies": {
     "ethers": "^5"
