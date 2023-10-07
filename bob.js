@@ -70,5 +70,16 @@ function _calculateCipherText(bobkey, bobk, setup, message, multiK, encPriv) {
     cipherTex1.contents,
     setup.seal
   );
+
+  cipherTex0.delete();
+
+  for (const c of cipherTex00.contents) {
+    c.delete();
+  }
+
+  for (const c of cipherTex1.contents) {
+    c.delete();
+  }
+
   return c2;
 }
