@@ -4,12 +4,14 @@ import { EC } from "./lib/makek.js";
 
 var ec = new EC("secp256k1");
 
-export function step2(forBob, bobkey) {
+const defaultKey = ec.keyFromPrivate(new BN(2));
+
+export async function step2(forBob, bobkey) {
   if (!ec.verify(forBob.challengeMsg, forBob.aliceKSig, forBob.alicekPubKey)) {
     return false;
   }
 
-  var bobk = ec.makeK(forBob.message, ec);
+  var bobk = await ec.makeK(forBob.message, bobkey);
   var multiK = forBob.alicekPubKey.getPublic().mul(bobk.k);
   var bobkInsKey = ec.keyFromPrivate(bobk.k.toJSON(), "hex");
   var signature = ec.sign(forBob.challengeMsg, bobkInsKey);
@@ -21,7 +23,7 @@ export function step2(forBob, bobkey) {
     cipherTextMatrix: false,
     bobKPubKey: bobInsPubKey,
   };
-  fromBob.cipherTextMatrix = _calculateCipherText(
+  fromBob.cipherTextMatrix = await _calculateCipherText(
     bobkey,
     bobk,
     forBob.setup,
@@ -33,8 +35,15 @@ export function step2(forBob, bobkey) {
   return fromBob;
 }
 
-function _calculateCipherText(bobkey, bobk, setup, message, multiK, encPriv) {
-  var instantNumber = ec.makeK(message, ec);
+async function _calculateCipherText(
+  bobkey,
+  bobk,
+  setup,
+  message,
+  multiK,
+  encPriv
+) {
+  var instantNumber = await ec.makeK(message, defaultKey);
   instantNumber = instantNumber.k.umod(
     new BN("1000000000000000000000000000000")
   );

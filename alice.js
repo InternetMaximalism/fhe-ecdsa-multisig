@@ -8,7 +8,7 @@ import { EC } from "./lib/makek.js";
 var ec = new EC("secp256k1");
 
 export async function step1(aliceKey, message) {
-  var alicek = ec.makeK(message, ec);
+  var alicek = await ec.makeK(message, aliceKey);
   var setup = await LWEsetup();
   var challengeMsg = _generateRandomBN();
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/transactions": "^5.7.0",
+    "@noble/secp256k1": "^2.2.3",
     "elliptic": "^6.5.4",
     "nodeseal-bn": "github:InternetMaximalism/nodeseal-bn#dev"
   },
