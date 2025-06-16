@@ -20,10 +20,10 @@ describe("unit tests", async function () {
 
     var message = new BN("113235254334098504928004375928");
     //Alice
-    var alicek = await ec.makeK(message, key);
+    var alicek = ec.makeK(message, key);
     //Bob
-    var bobk = await ec.makeK(message, bobkey);
-    var instantNumber = await ec.makeK(message, defaultKey); //.umod(new BN("1000000000000000000"));
+    var bobk = ec.makeK(message, bobkey);
+    var instantNumber = ec.makeK(message, defaultKey);
     instantNumber = instantNumber.k.umod(
       new BN("1000000000000000000000000000000")
     );
