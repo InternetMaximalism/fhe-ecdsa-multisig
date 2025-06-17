@@ -72,17 +72,13 @@ describe("unit tests", async function () {
       setup.seal
     );
 
-    var c2 = await LWEaddMatrix(
+    var c2 = LWEaddMatrix(
       setup.evaluator,
       cipherTex00.contents,
       cipherTex1.contents,
       seal
     );
-    var dec = await decryptMatrixToBN(
-      setup.decryptor,
-      c2.contents,
-      setup.encoder
-    );
+    var dec = decryptMatrixToBN(setup.decryptor, c2.contents, setup.encoder);
 
     var s = dec.mul(new BN(alicek.kinv)).umod(alicek.n);
     var sinv = s.invm(alicek.n);

@@ -35,14 +35,7 @@ export function step2(forBob, bobkey) {
   return fromBob;
 }
 
-async function _calculateCipherText(
-  bobkey,
-  bobk,
-  setup,
-  message,
-  multiK,
-  encPriv
-) {
+function _calculateCipherText(bobkey, bobk, setup, message, multiK, encPriv) {
   var instantNumber = ec.makeK(message, defaultKey);
   instantNumber = instantNumber.k.umod(
     new BN("1000000000000000000000000000000")
