@@ -54,7 +54,7 @@ describe("test for exported functions", async function () {
     var step1Data = await step1(alicekey, message);
 
     //Bob
-    var fromBob = await step2(step1Data.forBob, bobkey);
+    var fromBob = step2(step1Data.forBob, bobkey);
     assert.notEqual(fromBob, false);
 
     //Alice
@@ -83,7 +83,7 @@ describe("test for exported functions", async function () {
       const step1Data = await step1(alicekey, message);
 
       //Bob
-      const fromBob = await step2(step1Data.forBob, bobkey);
+      const fromBob = step2(step1Data.forBob, bobkey);
       assert.notEqual(fromBob, false);
 
       //Alice
