@@ -11,6 +11,7 @@ import {
   recoverAliceKeyFromMultiSigKey,
 } from "../lib/getMultiSigAddressPoint.js";
 import { EC } from "../lib/makek.js";
+import { it } from "node:test";
 
 var ec = new EC("secp256k1");
 
@@ -65,11 +66,52 @@ describe("test for exported functions", async function () {
     // sendSignature(txParams, signature);
   });
 
+  it("get same multisig from same message and private key", async function () {
+    const { message } = createTransaction();
+
+    //Alice
+    const alicekey = ec.genKeyPair();
+    const bobkey = ec.genKeyPair();
+
+    let firstSignature = null;
+    for (let i = 0; i < 2; i++) {
+      const multiP = getMultiSigAddressPoint(alicekey, bobkey.getPublic());
+      const address = ethers.utils.computeAddress(
+        "0x" + multiP.encode("hex", false)
+      );
+
+      const step1Data = await step1(alicekey, message);
+
+      //Bob
+      const fromBob = step2(step1Data.forBob, bobkey);
+      assert.notEqual(fromBob, false);
+
+      //Alice
+      const signature = step3(fromBob, step1Data);
+
+      const { validity } = recoverEncryptedMultiSig(
+        message,
+        address,
+        signature
+      );
+      assert.equal(validity, true);
+
+      if (firstSignature) {
+        assert.deepEqual(firstSignature, signature);
+      } else {
+        firstSignature = signature;
+      }
+    }
+  });
+
   it("recover Alice key from multi-sig key", async function () {
     const aliceKey = ec.genKeyPair();
     const bobKey = ec.genKeyPair();
     const multiSigKey = getMultiSigPrivateKey(aliceKey, bobKey);
-    const recoveredAliceKey = recoverAliceKeyFromMultiSigKey(multiSigKey, bobKey);
+    const recoveredAliceKey = recoverAliceKeyFromMultiSigKey(
+      multiSigKey,
+      bobKey
+    );
     assert.ok(recoveredAliceKey.eq(aliceKey.getPrivate()));
-  })
+  });
 });

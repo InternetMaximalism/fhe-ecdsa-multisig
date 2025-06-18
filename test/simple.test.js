@@ -11,14 +11,19 @@ import { EC } from "../lib/makek.js";
 
 var ec = new EC("secp256k1");
 
+const defaultKey = ec.keyFromPrivate(new BN(2));
+
 describe("unit tests", async function () {
   it("simple test", async function () {
+    var key = ec.genKeyPair();
+    var bobkey = ec.genKeyPair();
+
     var message = new BN("113235254334098504928004375928");
     //Alice
-    var alicek = ec.makeK(message, ec);
+    var alicek = ec.makeK(message, key);
     //Bob
-    var bobk = ec.makeK(message, ec);
-    var instantNumber = ec.makeK(message, ec); //.umod(new BN("1000000000000000000"));
+    var bobk = ec.makeK(message, bobkey);
+    var instantNumber = ec.makeK(message, defaultKey); //.umod(new BN("1000000000000000000"));
     instantNumber = instantNumber.k.umod(
       new BN("1000000000000000000000000000000")
     );
@@ -28,7 +33,6 @@ describe("unit tests", async function () {
     console.log("diff check", alicek.k.toString() !== bobk.k.toString());
 
     //Alice
-    var key = ec.genKeyPair();
     var setup = await LWEsetup();
     var encPriv = await LWEencrypt(
       setup.encryptor,
@@ -37,7 +41,6 @@ describe("unit tests", async function () {
     );
 
     //Bob
-    var bobkey = ec.genKeyPair();
     var multiP = key.getPublic().mul(bobkey.getPrivate());
     var multiP_ = bobkey.getPublic().mul(key.getPrivate());
     assert.equal(multiP.getX().toString(), multiP_.getX().toString());
