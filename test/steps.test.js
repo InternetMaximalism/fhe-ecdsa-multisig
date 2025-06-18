@@ -108,9 +108,6 @@ describe("test for exported functions", async function () {
 
   it("Verify compatibility with ethers and viem", async function () {
     const message = "Hello World";
-    const digestHex = hashMessage(message);
-    const digestBytes = hexToBytes(digestHex.replace("0x", ""));
-    const messageBN = new BN(digestHex.replace("0x", ""), 16);
 
     // Alice
     const aliceKey = ec.genKeyPair();
@@ -122,6 +119,7 @@ describe("test for exported functions", async function () {
     );
     console.log("address", address);
 
+    const messageBN = new BN(hashMessage(message).replace("0x", ""), 16);
     const step1Data = await step1(aliceKey, messageBN);
 
     // Bob
@@ -132,6 +130,7 @@ describe("test for exported functions", async function () {
     const signature = step3(fromBob, step1Data);
     console.log("signature", signature);
 
+    // Ethers
     const v = signature.recoveryParam + 27;
     const r = signature.r.slice(2);
     const s = signature.s.slice(2);
@@ -140,7 +139,7 @@ describe("test for exported functions", async function () {
     const ethSignature = `0x${r}${s}${v.toString(16).padStart(2, "0")}`;
     console.log("ethSignature", ethSignature);
 
-    // Ethers
+    const digestBytes = hexToBytes(hashMessage(message).replace("0x", ""));
     const recoveredAddress = recoverAddress(digestBytes, ethSignature);
     console.log("recoveredAddress", recoveredAddress);
 
