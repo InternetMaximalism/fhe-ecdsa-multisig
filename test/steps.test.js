@@ -1,7 +1,9 @@
 import { keccak256 } from "@ethersproject/keccak256";
-import { serialize } from "@ethersproject/transactions";
+import { recoverAddress, serialize } from "@ethersproject/transactions";
+import { hexToBytes } from "@noble/hashes/utils";
 import BN from "bn.js";
 import { ethers } from "ethers";
+import { hashMessage } from "ethers/lib/utils.js";
 import { strict as assert } from "node:assert";
 import { recoverEncryptedMultiSig, step1, step3 } from "../alice.js";
 import { step2 } from "../bob.js";
@@ -102,6 +104,52 @@ describe("test for exported functions", async function () {
         firstSignature = signature;
       }
     }
+  });
+
+  it("Verify compatibility with ethers and viem", async function () {
+    const message = "Hello World";
+    const digestHex = hashMessage(message);
+    const digestBytes = hexToBytes(digestHex.replace("0x", ""));
+    const messageBN = new BN(digestHex.replace("0x", ""), 16);
+
+    // Alice
+    const aliceKey = ec.genKeyPair();
+    const bobKey = ec.genKeyPair();
+
+    const multiP = getMultiSigAddressPoint(aliceKey, bobKey.getPublic());
+    const address = ethers.utils.computeAddress(
+      "0x" + multiP.encode("hex", false)
+    );
+    console.log("address", address);
+
+    const step1Data = await step1(aliceKey, messageBN);
+
+    // Bob
+    const fromBob = step2(step1Data.forBob, bobKey, true);
+    assert.notEqual(fromBob, false);
+
+    // Alice
+    const signature = step3(fromBob, step1Data);
+    console.log("signature", signature);
+
+    const v = signature.recoveryParam + 27;
+    const r = signature.r.slice(2);
+    const s = signature.s.slice(2);
+    console.log("rsv", r, s, v);
+
+    const ethSignature = `0x${r}${s}${v.toString(16).padStart(2, "0")}`;
+    console.log("ethSignature", ethSignature);
+
+    // Ethers
+    const recoveredAddress = recoverAddress(digestBytes, ethSignature);
+    console.log("recoveredAddress", recoveredAddress);
+
+    const { validity } = recoverEncryptedMultiSig(
+      messageBN,
+      address,
+      signature
+    );
+    assert.equal(validity, true);
   });
 
   it("recover Alice key from multi-sig key", async function () {
